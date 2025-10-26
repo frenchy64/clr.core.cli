@@ -1,0 +1,38 @@
+name: Copilot Setup Steps (.NET & Cache)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/copilot-setup-steps.yml'
+
+env:
+  ACTIONS_CACHE_VERSION: 1 # Change this number to invalidate cache
+
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            8.0.x
+            6.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ env.ACTIONS_CACHE_VERSION }}-${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.sln') }}
+          restore-keys: |
+            ${{ env.ACTIONS_CACHE_VERSION }}-${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore Clojure/Clojure.sln
