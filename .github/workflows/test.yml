@@ -1,0 +1,27 @@
+name: .NET Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test-dotnet:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore src/dotnet/Cljr.Tests/Cljr.Tests.csproj
+
+      - name: Build projects
+        run: dotnet build src/dotnet/Cljr.Tests/Cljr.Tests.csproj --configuration Release
+
+      - name: Run C# unit tests
+        run: dotnet test src/dotnet/Cljr.Tests/Cljr.Tests.csproj --no-build --configuration Release
